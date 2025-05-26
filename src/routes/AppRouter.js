@@ -11,7 +11,9 @@ import Friends from '../pages/Friends';
 import Posts from '../pages/Posts';
 import Navigation from '../components/Navigation'; 
 import ChangePassword from '../pages/ChangePassword';
+import GoogleCallback from '../pages/GoogleCallback';
 import { Container } from '@mui/material'; 
+
 const AppRouter = () => {
     return (
         <BrowserRouter>
@@ -21,6 +23,7 @@ const AppRouter = () => {
                     <Routes>
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
+                        <Route path="/auth/google/callback" element={<GoogleCallback />} />
                         <Route element={<PrivateRoute />}>
                             <Route path="/" element={<Home />} />
                             <Route path="/profile/:userId" element={<Profile />} />

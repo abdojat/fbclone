@@ -13,6 +13,7 @@ import {
     CircularProgress,
 } from '@mui/material';
 import { useAuth } from '../context/AuthContext';
+import { Link } from 'react-router-dom';
 
 const FriendSuggestionCard = ({ userId, onAction, handleRespond, refresherKey, refresher }) => {
     const currentUserId = useAuth().user._id;
@@ -57,17 +58,20 @@ const FriendSuggestionCard = ({ userId, onAction, handleRespond, refresherKey, r
         <Grid key={user._id}>
             <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                 <CardContent sx={{ flexGrow: 1, textAlign: 'center' }}>
-                    <Avatar
-                        src={user.picturePath}
-                        sx={{
-                            width: 80,
-                            height: 80,
-                            margin: '0 auto 16px'
-                        }}
-                    />
-                    <Typography variant="h6" component="div">
-                        {user.username}
-                    </Typography>
+                    <Link to={`/profile/${user._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                        <Avatar
+                            src={user.picturePath}
+                            sx={{
+                                width: 80,
+                                height: 80,
+                                margin: '0 auto 8px'
+                            }}
+                        />
+                        <Typography variant="h6" component="div">
+                            {user.username}
+                        </Typography>
+                    </Link>
+
                     <Typography variant="body2" color="text.secondary">
                         {user.mutualFriends > 0
                             ? `${user.mutualFriends} mutual friends`
@@ -94,7 +98,7 @@ const FriendSuggestionCard = ({ userId, onAction, handleRespond, refresherKey, r
                             <Button
                                 size="small"
                                 variant="contained"
-                                color="errpr"
+                                color="error"
                                 disabled={loading}
                                 onClick={async () => {
                                     setLoading(true);

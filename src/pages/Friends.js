@@ -10,6 +10,7 @@ import {
 import FriendRequests from '../components/FriendRequests';
 import FriendSuggesttions from '../components/FriendSuggestions';
 import SentFriendRequests from '../components/SentFriendRequests';
+import LiveSearchBar from '../components/LiveSearchBar';
 
 const Friends = () => {
     const [refreshKey, setRefreshKey] = useState(0);
@@ -21,6 +22,8 @@ const Friends = () => {
     };
     return (
         <Container maxWidth="md">
+
+            <LiveSearchBar />
             <Box sx={{ my: 4 }}>
                 { /* Your Friends Requests */}
                 <FriendRequests refresher={handelRefresh} refresherKey={refreshKey} />

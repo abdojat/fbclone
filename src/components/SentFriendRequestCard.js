@@ -12,6 +12,7 @@ import {
     ListItemText,
     Chip
 } from '@mui/material';
+import { Link } from 'react-router-dom';
 
 const SentFriendRequestCard = ({ friendId, requestResponse }) => {
     const currentUserId = useAuth().user._id;
@@ -40,13 +41,26 @@ const SentFriendRequestCard = ({ friendId, requestResponse }) => {
 
     return (
         <ListItem key={friendId} sx={{ p: 2 }}>
-            <ListItemAvatar>
-                <Avatar src={friend.picturePath} />
-            </ListItemAvatar>
-            <ListItemText
-                primary={friend.username}
-                secondary={`${friend.firstName} ${friend.lastName}`}
-            />
+            <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
+                <Link
+                    to={`/profile/${friend._id}`}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        textDecoration: 'none',
+                        color: 'inherit',
+                    }}
+                >
+                    <ListItemAvatar>
+                        <Avatar src={friend.picturePath} />
+                    </ListItemAvatar>
+                    <ListItemText
+                        primary={friend.username}
+                        secondary={`${friend.firstName} ${friend.lastName}`}
+                    />
+                </Link>
+            </Box>
+
 
             <Box sx={{ display: 'flex', gap: 1 }}>
                 <Chip

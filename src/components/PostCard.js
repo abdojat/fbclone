@@ -24,7 +24,7 @@ import {
     Bookmark,
     BookmarkBorder
 } from '@mui/icons-material';
-
+import { Link } from 'react-router-dom';
 
 const PostCard = ({ post, onUpdate, onUnsave }) => {
     const { addSavedPost, removeSavedPost, setUser } = useAuth();
@@ -114,15 +114,17 @@ const PostCard = ({ post, onUpdate, onUnsave }) => {
             <CardContent>
                 {/* Author Header */}
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                    <Avatar src={authorImageUrl} alt={post.author?.username} />
-                    <Box sx={{ ml: 2 }}>
-                        <Typography variant="subtitle1">
-                            {post.author?.username}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                            {new Date(post.createdAt).toLocaleString()}
-                        </Typography>
-                    </Box>
+                    <Link to={`/profile/${post.author._id}`} style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center' }}>
+                        <Avatar src={authorImageUrl} alt={post.author?.username} />
+                        <Box sx={{ ml: 2 }}>
+                            <Typography variant="subtitle1" >
+                                {post.author?.username}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                                {new Date(post.createdAt).toLocaleString()}
+                            </Typography>
+                        </Box>
+                    </Link>
                     {user?._id === post.author?._id && (
                         <Box sx={{ ml: 'auto', display: 'flex', gap: 1 }}>
                             <Button color="primary" size="small" onClick={handleEdit}>

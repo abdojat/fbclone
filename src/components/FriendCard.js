@@ -13,6 +13,7 @@ import {
     Chip,
     CircularProgress
 } from '@mui/material';
+import { Link } from 'react-router-dom';
 
 
 const FriendCard = ({ friend, isOwner, friendAction, requestResponse, onChanged }) => {
@@ -36,13 +37,16 @@ const FriendCard = ({ friend, isOwner, friendAction, requestResponse, onChanged 
 
     return (
         <ListItem key={friend._id} sx={{ p: 2 }}>
-            <ListItemAvatar>
-                <Avatar src={friend.picturePath} />
-            </ListItemAvatar>
-            <ListItemText
-                primary={friend.username}
-                secondary={`${friend.firstName} ${friend.lastName}`}
-            />
+            <Link to={`/profile/${friend._id}`} style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'inherit' }}>
+                <ListItemAvatar>
+                    <Avatar src={friend.picturePath} />
+                </ListItemAvatar>
+                <ListItemText
+                    primary={friend.username}
+                    secondary={`${friend.firstName} ${friend.lastName}`}
+                />
+            </Link>
+
             {(isOwner || currentUser?.friends?.some(f => f === friend._id)) && (
                 <Box sx={{ ml: 'auto' }}>
                     <Chip
@@ -82,7 +86,7 @@ const FriendCard = ({ friend, isOwner, friendAction, requestResponse, onChanged 
                                     setRefreshKey(refreshKey => refreshKey + 1);
                                     setActionLoading(false);
                                 }}
-                                
+
                             >
                                 {actionLoading ? <CircularProgress size={20} /> : 'Cancel'}
                             </Button>

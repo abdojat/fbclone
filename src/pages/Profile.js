@@ -37,12 +37,16 @@ const Profile = () => {
     const [tabValue, setTabValue] = useState(0);
     const [refreshKey, setRefreshKey] = useState(0);
     const [image, setImage] = useState(null);
+    const [isFriend, setIsFriend] = useState(false);
+    const [requestSent, setRequestSent] = useState(false);
+    const [requestReceived, setRequestReceived] = useState(false);
+    const [actionLoading, setActionLoading] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 setIsLoading(true);
-                const [userRes, postsRes,] = await Promise.all([
+                const [userRes, postsRes] = await Promise.all([
                     API.get(`/users/${userId}`),
                     API.get(`/posts/user/${userId}`),
                 ]);
@@ -61,6 +65,26 @@ const Profile = () => {
         fetchData();
     }, [userId, currentUserId, navigate, refreshKey]);
 
+    useEffect(() => {
+        const fetchFriendStatus = async () => {
+            try {
+                if (userId !== currentUserId) {
+                    const myData = await API.get(`/users/${currentUserId}`);
+                    const friends = myData.data.friends;
+                    const sentRequests = myData.data.sentFriendRequests.map(r => r.recipient);
+                    const receivedRequests = myData.data.friendRequests.map(r => r.sender);
+                    setIsFriend(friends.some(f => f.toString() === userId));
+                    setRequestSent(sentRequests.some(r => r.toString() === userId));
+                    setRequestReceived(receivedRequests.some(r => r.toString() === userId));
+
+                }
+            } catch (error) {
+                console.error('Error checking friend status:', error);
+            }
+        };
+
+        fetchFriendStatus();
+    }, [userId, currentUserId]);
 
     const handleEditToggle = () => {
         setIsEditing(!isEditing);
@@ -93,15 +117,48 @@ const Profile = () => {
         }
     };
 
-    const handleTabChange = (event, newValue) => {
-        setTabValue(newValue);
-    };
-
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
             setImage(file);
         }
+    };
+
+    const handleFriendAction = async (action) => {
+        try {
+            setActionLoading(true);
+            await API.post('/friends/action', { action, targetUserId: userId });
+            if (action === 'remove') setIsFriend(false);
+            if (action === 'cancel') setRequestSent(false);
+            if (action === 'add') setRequestSent(true);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const handleRespondToRequest = async (action) => {
+        try {
+            setActionLoading(true);
+            const me = await API.get(`/users/${currentUserId}`);
+            const request = me.data.friendRequests.find(r => r.sender === userId);
+            await API.post('/friends/action', {
+                action,
+                targetUserId: userId,
+                requestId: request._id
+            });
+            if (action === 'accept') setIsFriend(true);
+            setRequestReceived(false);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const handleTabChange = (event, newValue) => {
+        setTabValue(newValue);
     };
 
     if (isLoading) {
@@ -148,6 +205,58 @@ const Profile = () => {
                         src={user.picturePath}
                         sx={{ width: 150, height: 150, mb: 2 }}
                     />
+                    {!isOwner && (
+                        <Box>
+                            {isFriend ? (
+                                <Button
+                                    variant="outlined"
+                                    color="error"
+                                    onClick={() => handleFriendAction('remove')}
+                                    disabled={actionLoading}
+                                >
+                                    {actionLoading ? <CircularProgress size={20} /> : 'Remove Friend'}
+                                </Button>
+                            ) : requestSent ? (
+                                <Button
+                                    variant="outlined"
+                                    color="warning"
+                                    onClick={() => handleFriendAction('cancel')}
+                                    disabled={actionLoading}
+                                >
+                                    {actionLoading ? <CircularProgress size={20} /> : 'Cancel Request'}
+                                </Button>
+                            ) : requestReceived ? (
+                                <>
+                                    <Button
+                                        variant="contained"
+                                        color="success"
+                                        onClick={() => handleRespondToRequest('accept')}
+                                        disabled={actionLoading}
+                                    >
+                                        {actionLoading ? <CircularProgress size={20} /> : 'Accept Request'}
+                                    </Button>
+                                    <Button
+                                        variant="outlined"
+                                        color="error"
+                                        onClick={() => handleRespondToRequest('reject')}
+                                        disabled={actionLoading}
+                                        sx={{ ml: 1 }}
+                                    >
+                                        {actionLoading ? <CircularProgress size={20} /> : 'Reject'}
+                                    </Button>
+                                </>
+                            ) : (
+                                <Button
+                                    variant="contained"
+                                    onClick={() => handleFriendAction('add')}
+                                    disabled={actionLoading}
+                                >
+                                    {actionLoading ? <CircularProgress size={20} /> : 'Add Friend'}
+                                </Button>
+                            )}
+                        </Box>
+                    )}
+
                     {isEditing && (
                         <Button
                             component="label"
@@ -248,6 +357,7 @@ const Profile = () => {
                     )}
                 </Box>
             </Box>
+
             <Box mt={4}>
                 <Tabs value={tabValue} onChange={handleTabChange} sx={{ mb: 3 }}>
                     <Tab label="Posts" />

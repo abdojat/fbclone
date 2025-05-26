@@ -12,6 +12,7 @@ import {
     ListItemText,
     CircularProgress,
 } from '@mui/material';
+import { Link } from 'react-router-dom';
 
 
 const FriendRequest = ({ request, onAction }) => {
@@ -28,13 +29,26 @@ const FriendRequest = ({ request, onAction }) => {
 
     return (
         <ListItem key={request._id}>
-            <ListItemAvatar>
-                <Avatar src={senderPictureUrl} />
-            </ListItemAvatar>
-            <ListItemText
-                primary={request.sender.username}
-                secondary={`Sent ${new Date(request.createdAt).toLocaleDateString()}`}
-            />
+            <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
+                <Link
+                    to={`/profile/${request.sender._id}`}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        textDecoration: 'none',
+                        color: 'inherit',
+                    }}
+                >
+                    <ListItemAvatar>
+                        <Avatar src={senderPictureUrl} />
+                    </ListItemAvatar>
+                    <ListItemText
+                        primary={request.sender.username}
+                        secondary={`Sent ${new Date(request.createdAt).toLocaleDateString()}`}
+                    />
+                </Link>
+            </Box>
+
             <Box sx={{ display: 'flex', gap: 1 }}>
                 <Button
                     variant="contained"
