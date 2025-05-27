@@ -87,16 +87,6 @@ const Login = () => {
                     </Typography>
                 </form>
             </Box>
-            <Button
-                fullWidth
-                variant="outlined"
-                sx={{ mt: 2 }}
-                onClick={() => {
-                    window.location.href = 'http://localhost:5000/api/auth/google';
-                }}
-            >
-                Sign in with Google
-            </Button>
         </Container>
     );
 };
