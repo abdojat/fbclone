@@ -23,6 +23,8 @@ import { useAuth } from '../context/AuthContext';
 import UserFriends from '../components/UserFriends';
 import SavedPosts from '../components/SavedPosts';
 import PostFeed from '../components/PostFeed';
+import { CHAT, USERS, POSTS, FRIENDS, UPLOAD } from '../api/endpoints';
+
 
 const Profile = () => {
     const currentUserId = useAuth().user._id;
@@ -47,8 +49,8 @@ const Profile = () => {
             try {
                 setIsLoading(true);
                 const [userRes, postsRes] = await Promise.all([
-                    API.get(`/users/${userId}`),
-                    API.get(`/posts/user/${userId}`),
+                    API.get(USERS.getUser(userId)),
+                    API.get(POSTS.userPosts(userId)),
                 ]);
                 setUser(userRes.data);
                 setEditedData(userRes.data);
@@ -69,7 +71,7 @@ const Profile = () => {
         const fetchFriendStatus = async () => {
             try {
                 if (userId !== currentUserId) {
-                    const myData = await API.get(`/users/${currentUserId}`);
+                    const myData = await API.get(USERS.getUser(currentUserId));
                     const friends = myData.data.friends;
                     const sentRequests = myData.data.sentFriendRequests.map(r => r.recipient);
                     const receivedRequests = myData.data.friendRequests.map(r => r.sender);
@@ -86,6 +88,9 @@ const Profile = () => {
         fetchFriendStatus();
     }, [userId, currentUserId]);
 
+    const refresher = () => {
+        setRefreshKey(refreshKey => refreshKey + 1);
+    };
     const handleEditToggle = () => {
         setIsEditing(!isEditing);
     };
@@ -101,13 +106,13 @@ const Profile = () => {
             const formData = new FormData();
             if (image) {
                 formData.append('image', image);
-                const imageRes = await API.post('/upload/image', formData, {
+                const imageRes = await API.post(UPLOAD.image, formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
                 const imageUrl = imageRes.data.imageUrl;
                 editedData.picturePath = imageUrl;
             }
-            const res = await API.put(`/users/${userId}`, editedData);
+            const res = await API.put(USERS.getUser(userId), editedData);
             setUser(res.data);
             setIsEditing(false);
         } catch (error) {
@@ -127,7 +132,7 @@ const Profile = () => {
     const handleFriendAction = async (action) => {
         try {
             setActionLoading(true);
-            await API.post('/friends/action', { action, targetUserId: userId });
+            await API.post(FRIENDS.action, { action, targetUserId: userId });
             if (action === 'remove') setIsFriend(false);
             if (action === 'cancel') setRequestSent(false);
             if (action === 'add') setRequestSent(true);
@@ -141,9 +146,9 @@ const Profile = () => {
     const handleRespondToRequest = async (action) => {
         try {
             setActionLoading(true);
-            const me = await API.get(`/users/${currentUserId}`);
+            const me = await API.get(USERS.getUser(currentUserId));
             const request = me.data.friendRequests.find(r => r.sender === userId);
-            await API.post('/friends/action', {
+            await API.post(FRIENDS.action, {
                 action,
                 targetUserId: userId,
                 requestId: request._id
@@ -159,6 +164,10 @@ const Profile = () => {
 
     const handleTabChange = (event, newValue) => {
         setTabValue(newValue);
+    };
+
+    const handleStartChat = () => {
+        navigate(CHAT.room(user._id));
     };
 
     if (isLoading) {
@@ -197,8 +206,17 @@ const Profile = () => {
                         {isLoading ? <CircularProgress size={20} /> : isEditing ? <SaveIcon /> : <EditIcon />}
                     </IconButton>
                 )}
+                {!isOwner && (
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleStartChat}
+                        sx={{ mt: 2 }}
+                    >
+                        Message
+                    </Button>)
+                }
             </Box>
-
             <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={4}>
                 <Box flex={1} display="flex" flexDirection="column" alignItems="center">
                     <Avatar
@@ -384,7 +402,7 @@ const Profile = () => {
                 )}
 
                 {tabValue === 1 && (
-                    <UserFriends userId={userId} userinfo={user} />
+                    <UserFriends userId={userId} userinfo={user} refresher={refresher} />
                 )}
 
                 {tabValue === 2 && isOwner && (

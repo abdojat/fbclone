@@ -5,6 +5,8 @@ import { useState, useEffect } from 'react';
 import { TextField, List, ListItem, ListItemAvatar, Avatar, ListItemText, Box } from '@mui/material';
 import API from '../api/api';
 import { useNavigate } from 'react-router-dom';
+import { USERS } from '../api/endpoints';
+import PageLayout from './PageLayout';
 
 const LiveSearchBar = () => {
     const [query, setQuery] = useState('');
@@ -14,7 +16,7 @@ const LiveSearchBar = () => {
     useEffect(() => {
         const delayDebounce = setTimeout(() => {
             if (query.trim()) {
-                API.get(`/users/search?q=${query}`)
+                API.get(USERS.searchUsers(query))
                     .then(res => setResults(res.data))
                     .catch(() => setResults([]));
             } else {
@@ -26,7 +28,7 @@ const LiveSearchBar = () => {
     }, [query]);
 
     return (
-        <Box sx={{ width: '100%' }}>
+        <PageLayout>
             <TextField
                 label="Search Friends"
                 fullWidth
@@ -52,7 +54,7 @@ const LiveSearchBar = () => {
                 )
             )}
 
-        </Box>
+        </PageLayout>
     );
 };
 

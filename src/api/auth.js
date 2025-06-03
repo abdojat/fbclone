@@ -2,7 +2,9 @@
 
 import API from './api';
 
-export const register = (userData) => API.post('/users/register', userData);
-export const login = (credentials) => API.post('/users/login', credentials);
-export const getMe = () => API.get('/users/me');
-export const logout = () => API.post('/users/logout');
+import { AUTH } from './endpoints';
+
+export const register = (userData) => API.post(AUTH.register, userData);
+export const login = (creds) => API.post(AUTH.login, creds);
+export const getMe = () => API.get(AUTH.getMe);
+export const logout = () => API.post(AUTH.logout)

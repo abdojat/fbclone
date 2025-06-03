@@ -5,16 +5,17 @@ import API from '../api/api';
 import {
     Box,
     Typography,
-    Grid,
+    List,
 } from '@mui/material';
-import FriendSuggestionCard from './FriendSuggestionCard';
-
+import FriendCard from './FriendCard';
+import { FRIENDS } from '../api/endpoints';
+import PageLayout from './PageLayout';
 
 const FriendSuggesttions = ({ refresher, refresherKey }) => {
     const [suggestions, setSuggestions] = useState([]);
     const fetchData = async () => {
         try {
-            const suggestionsRes = await API.get('/friends/suggestions');
+            const suggestionsRes = await API.get(FRIENDS.suggestions);
             setSuggestions(suggestionsRes.data);
         } catch (error) {
             console.error('Error fetching friends data:', error);
@@ -25,38 +26,20 @@ const FriendSuggesttions = ({ refresher, refresherKey }) => {
         fetchData();
     }, [refresherKey]);
 
-    const handleAddFriend = async (targetUserId, action) => {
-        try {
-            await API.post(`/friends/action`, { action, targetUserId });
-            refresher();
-        } catch (error) {
-            console.error('Error sending friend request:', error);
-        }
-    };
-
-    const handleRequestResponse = async (requestId, action, targetUserId) => {
-        try {
-            await API.post(`/friends/action`, { requestId, action, targetUserId });
-            refresher();
-        } catch (error) {
-            console.error('Error responding to request:', error);
-        }
-    };
     return (
-        <Box>
-            <Typography variant="h4" gutterBottom>Friend Suggestions</Typography>
-            {suggestions.length === 0 ? (
-                <Typography>No suggestions available</Typography>
-            ) : (
-                <Grid container spacing={3}>
-                    {suggestions.map(user => (
-                        <Grid key={user._id}>
-                            <FriendSuggestionCard key={user._id} userId={user._id} onAction={handleAddFriend} handleRespond={handleRequestResponse} refresher={refresher} refresherKey={refresherKey}/>
-                        </Grid>
-                    ))}
-                </Grid>
-            )}
-        </Box>
+        <PageLayout title="Friend Suggestions">
+            {
+                suggestions.length === 0 ? (
+                    <Typography>No suggestions available</Typography>
+                ) : (
+                    <List container spacing={3}>
+                        {suggestions.map(user => (
+                            <FriendCard key={user._id} friendId={user._id} refresher={refresher} />
+                        ))}
+                    </List>
+                )
+            }
+        </PageLayout>
     );
 };
 

@@ -4,26 +4,26 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import API from '../api/api';
 import {
-    Box,
     Typography,
     Divider,
     List,
 } from '@mui/material';
 import FriendCard from './FriendCard';
+import PageLayout from '../components/PageLayout';
+import { USERS, FRIENDS } from '../api/endpoints';
 
-const UserFriends = ({ userId, userinfo, refresher }) => {
+const UserFriends = ({ userId, userinfo, refresher, refreshKey }) => {
     const currentUserId = useAuth().user._id;
     const [user, setUser] = useState(userinfo);
     const [friends, setFriends] = useState([]);
     const [isOwner, setIsOwner] = useState(false);
-    const [refreshKey, setRefreshKey] = useState(0);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const [userRes, friendsRes] = await Promise.all([
-                    API.get(`/users/${userId}`),
-                    API.get(`/friends/${userId}/friends`),
+                    API.get(USERS.getUser(userId)),
+                    API.get(FRIENDS.friendsList(userId)),
                 ]);
                 setUser(userRes.data);
                 setFriends(friendsRes.data);
@@ -36,45 +36,19 @@ const UserFriends = ({ userId, userinfo, refresher }) => {
         fetchData();
     }, [refreshKey]);
 
-
-    const handleFriendAction = async (targetUserId, action) => {
-        try {
-            await API.post(`/friends/action`, { action, targetUserId });
-            setRefreshKey(ref => ref + 1);
-            refresher && refresher();
-        } catch (error) {
-            console.error('Error performing friend action:', error);
-        }
-    };
-
-
-    const handleRequestResponse = async (requestId, action, targetUserId) => {
-        try {
-            await API.post(`/friends/action`, { requestId, action, targetUserId });
-            setRefreshKey(ref => ref + 1);
-        } catch (error) {
-            console.error('Error responding to request:', error);
-        }
-    };
     return (
-        <Box>
-            <Typography variant="h4" gutterBottom>
-                {isOwner ? 'Your Friends' : `${user.firstName}'s Friends`}
-            </Typography>
+        <PageLayout title={isOwner ? 'Your Friends' : `${user.firstName}’s Friends`}>
             <Divider sx={{ mb: 3 }} />
-
             {friends.length === 0 ? (
-                <Typography>
-                    {isOwner ? 'You have no friends yet' : 'This user has no friends yet'}
-                </Typography>
+                <Typography>{isOwner ? 'You have no friends yet' : 'This user has no friends yet'}</Typography>
             ) : (
                 <List>
-                    {friends.map(friend => (
-                        <FriendCard key={friend._id} friend={friend} isOwner={isOwner} friendAction={handleFriendAction} requestResponse={handleRequestResponse} />
+                    {friends.map((friend) => (
+                        <FriendCard key={friend._id} friendId={friend._id} refresher={refresher} />
                     ))}
                 </List>
             )}
-        </Box>
+        </PageLayout>
     )
 };
 

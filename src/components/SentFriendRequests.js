@@ -8,7 +8,9 @@ import {
     Divider,
     List
 } from '@mui/material';
-import SentFriendRequestCard from './SentFriendRequestCard';
+import FriendCard from './FriendCard';
+import { FRIENDS } from '../api/endpoints'; 
+import PageLayout from './PageLayout';
 
 const SentFriendRequests = ({ refresher, refresherKey }) => {
     const [sentFriendRequests, setSentFrinedRequests] = useState([]);
@@ -16,8 +18,7 @@ const SentFriendRequests = ({ refresher, refresherKey }) => {
         const fetchData = async () => {
             try {
 
-                const response = await API.get(`/friends/sentFriendRequests`);
-                console.log(response.data);
+                const response = await API.get(FRIENDS.sentRequests);
                 setSentFrinedRequests(response.data);
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -25,32 +26,21 @@ const SentFriendRequests = ({ refresher, refresherKey }) => {
         };
 
         fetchData();
-    }, [refresherKey ]);
+    }, [refresherKey]);
 
-    const handleRequestResponse = async (requestId, action, targetUserId) => {
-        try {
-            await API.post(`/friends/action`, { requestId, action, targetUserId });
-            refresher();
-        } catch (error) {
-            console.error('Error responding to request:', error);
-        }
-    };
     return (
-        <Box>
-            <Typography variant="h4" gutterBottom>
-                Sent Friend Requests
-            </Typography>
+        <PageLayout title="Sent Friend Requests">
             <Divider sx={{ mb: 3 }} />
             {sentFriendRequests?.length === 0 ? (
                 <Typography>No pending requests</Typography>
             ) : (
                 <List>
                     {sentFriendRequests?.map(requ => (
-                        <SentFriendRequestCard key={requ._id} isOwner={true} friendId={requ.recipient._id} requestResponse={handleRequestResponse} />
+                        <FriendCard key={requ._id} friendId={requ.recipient._id} refresher={refresher} />
                     ))}
                 </List>
             )}
-        </Box>
+        </PageLayout>
     );
 };
 

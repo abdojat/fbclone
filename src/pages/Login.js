@@ -11,6 +11,8 @@ import {
     Box,
     Link
 } from '@mui/material';
+import FormError from '../components/FormError';
+
 
 const Login = () => {
     const [formData, setFormData] = useState({
@@ -29,6 +31,7 @@ const Login = () => {
                 throw new Error('Incomplete login response');
             }
             localStorage.setItem('token', data.token);
+            console.log(data.user);
             authLogin(data.user, data.token);
 
         } catch (err) {
@@ -47,11 +50,7 @@ const Login = () => {
                 <Typography variant="h4" gutterBottom>
                     Login
                 </Typography>
-                {error && (
-                    <Typography color="error" gutterBottom>
-                        {error}
-                    </Typography>
-                )}
+                <FormError message={error} />
                 <form onSubmit={handleSubmit} style={{ width: '100%' }}>
                     <TextField
                         label="Email"

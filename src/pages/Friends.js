@@ -3,14 +3,13 @@
 import { useEffect, useState } from 'react';
 
 import {
-    Box,
-    Container,
     Divider
 } from '@mui/material';
 import FriendRequests from '../components/FriendRequests';
 import FriendSuggesttions from '../components/FriendSuggestions';
 import SentFriendRequests from '../components/SentFriendRequests';
 import LiveSearchBar from '../components/LiveSearchBar';
+import PageLayout from '../components/PageLayout';
 
 const Friends = () => {
     const [refreshKey, setRefreshKey] = useState(0);
@@ -21,22 +20,20 @@ const Friends = () => {
         setRefreshKey(ref => ref + 1)
     };
     return (
-        <Container maxWidth="md">
-
+        <PageLayout>
+            <Divider sx={{ my: 4 }} />
             <LiveSearchBar />
-            <Box sx={{ my: 4 }}>
-                { /* Your Friends Requests */}
-                <FriendRequests refresher={handelRefresh} refresherKey={refreshKey} />
-                <Divider sx={{ my: 4 }} />
+            { /* Your Friends Requests */}
+            <FriendRequests refresher={handelRefresh} refresherKey={refreshKey} />
+            <Divider sx={{ my: 4 }} />
 
-                {/* Friend Suggestions Section */}
-                <FriendSuggesttions refresher={handelRefresh} refresherKey={refreshKey} />
-                <Divider sx={{ my: 4 }} />
+            {/* Friend Suggestions Section */}
+            <FriendSuggesttions refresher={handelRefresh} refresherKey={refreshKey} />
+            <Divider sx={{ my: 4 }} />
 
-                {/* Sent Friend Requests*/}
-                <SentFriendRequests refresher={handelRefresh} refresherKey={refreshKey} />
-            </Box>
-        </Container>
+            {/* Sent Friend Requests*/}
+            <SentFriendRequests refresher={handelRefresh} refresherKey={refreshKey} />
+        </PageLayout>
     );
 };
 

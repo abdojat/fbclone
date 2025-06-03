@@ -15,6 +15,8 @@ import {
     CircularProgress
 } from '@mui/material';
 import PasswordStrengthBar from 'react-password-strength-bar';
+import FormError from '../components/FormError';
+import { AUTH } from '../api/endpoints';
 
 const ChangePassword = () => {
     const [formData, setFormData] = useState({
@@ -51,7 +53,7 @@ const ChangePassword = () => {
         setError('');
 
         try {
-            const { data } = await API.post('/users/change-password', {
+            const { data } = await API.post(AUTH.changePassword, {
                 currentPassword: formData.currentPassword,
                 newPassword: formData.newPassword
             });
@@ -82,11 +84,7 @@ const ChangePassword = () => {
                     Change Password
                 </Typography>
 
-                {error && (
-                    <Typography color="error" sx={{ mb: 2 }}>
-                        {error}
-                    </Typography>
-                )}
+                <FormError message={error} />
 
                 <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
                     <TextField
