@@ -15,24 +15,24 @@ import { useRecentChatsSocket } from '../hooks/useChatSocket';
 import API from '../api/api';
 import { CHAT, NOTIFICATIONS } from '../api/endpoints';
 import { useNewNotificationSocket } from '../hooks/useNotificationSocket';
+import { useSelector, useDispatch } from 'react-redux';
+import { setRecentChats, setLoading, selectUnreadMessagesCount } from '../hooks/messageSlice';
 
 const Navigation = () => {
     const { user, logout } = useAuth();
-    const [unreadMessagesCount, setChats] = useState(0);
+    const dispatch = useDispatch();
+    const unreadMessagesCount = useSelector(selectUnreadMessagesCount);
     const [unreadNotificationCount, setNotifications] = useState(0)
     const navigate = useNavigate();
     const fetchChats = useCallback(async () => {
         try {
             const chatRes = await API.get(CHAT.recent);
-            let cnt = 0;
-            chatRes.data.data.forEach(element => {
-                cnt += element.unreadCount;
-            });
-            setChats(cnt);
+            console.log('Fetched chats:', chatRes.data.data); // <-- Add this
+            dispatch(setRecentChats(chatRes.data.data));
         } catch (err) {
             console.error('Failed to fetch chats', err);
         }
-    }, []);
+    }, [dispatch]);
 
 
     const fetchNotifications = useCallback(async () => {

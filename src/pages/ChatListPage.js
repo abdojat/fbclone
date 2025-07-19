@@ -1,29 +1,33 @@
 // /src/pages/ChatsListPage.js
 
 
-import { useState, useCallback, useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import API from '../api/api';
 import { Typography, List, CircularProgress } from '@mui/material';
 import ChatCard from '../components/ChatCard';
 import { useRecentChatsSocket } from '../hooks/useChatSocket';
 import { CHAT } from '../api/endpoints';
 import PageLayout from '../components/PageLayout';
+import { useSelector, useDispatch } from 'react-redux';
+import { setRecentChats, setLoading } from '../hooks/messageSlice';
 
 const ChatsListPage = () => {
-    const [recentChats, setChats] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const dispatch = useDispatch();
+    const recentChats = useSelector((state) => state.messages.recentChats);
+    const loading = useSelector((state) => state.messages.loading);
 
     const fetchChats = useCallback(async () => {
-        setLoading(true);
+        dispatch(setLoading(true));
         try {
             const chatRes = await API.get(CHAT.recent);
-            setChats(chatRes.data.data);
+            console.log(chatRes.data.data);
+            dispatch(setRecentChats(chatRes.data.data));
         } catch (err) {
             console.error('Failed to fetch chats', err);
         } finally {
-            setLoading(false);
+            dispatch(setLoading(false));
         }
-    }, []);
+    }, [dispatch]);
 
     useEffect(() => {
         fetchChats();

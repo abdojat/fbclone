@@ -37,3 +37,29 @@ export function formatTime(timestamp) {
         return '';
     }
 }
+
+/**
+ * Formats a timestamp for chat/message display:
+ * - Today: 'Today, h:mm a'
+ * - Yesterday: 'Yesterday, h:mm a'
+ * - Else: 'MMM d, yyyy h:mm a'
+ */
+export function formatChatDate(timestamp) {
+    try {
+        const date = new Date(timestamp);
+        const now = new Date();
+        const isToday = date.toDateString() === now.toDateString();
+        const yesterday = new Date(now);
+        yesterday.setDate(now.getDate() - 1);
+        const isYesterday = date.toDateString() === yesterday.toDateString();
+        if (isToday) {
+            return `Today, ${format(date, 'h:mm a')}`;
+        } else if (isYesterday) {
+            return `Yesterday, ${format(date, 'h:mm a')}`;
+        } else {
+            return format(date, 'MMM d, yyyy h:mm a');
+        }
+    } catch {
+        return '';
+    }
+}

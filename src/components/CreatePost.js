@@ -41,14 +41,13 @@ const CreatePost = ({ onPostCreated }) => {
             for (let img of images) {
                 const formData = new FormData();
                 formData.append('image', img);
-
+                console.log('formData:',formData);
                 const res = await API.post('/upload/image', formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
 
                 uploadedUrls.push(res.data.imageUrl);
             }
-            console.log(uploadedUrls);
             const response = await API.post('/posts',
                 {
                     content: trimmedContent,

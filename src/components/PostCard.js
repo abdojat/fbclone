@@ -136,10 +136,10 @@ const PostCard = ({ post, onUpdate, onUnsave }) => {
                             {user?._id === post.author?._id && (
                                 <Box sx={{ ml: 'auto', display: 'flex', gap: 1 }}>
                                     <IconButton color="primary" size="small" onClick={handleEdit}>
-                                        <EditIcon/>
+                                        <EditIcon />
                                     </IconButton>
                                     <IconButton color="error" size="small" onClick={handleDelete}>
-                                        <DeleteIcon/>
+                                        <DeleteIcon />
                                     </IconButton>
                                 </Box>
                             )}
@@ -168,7 +168,11 @@ const PostCard = ({ post, onUpdate, onUnsave }) => {
                                         key={index}
                                         src={url}
                                         alt={`Post ${index + 1}`}
-                                        style={{ maxHeight: 300, borderRadius: 8 }}
+                                        style={{
+                                            maxHeight: '100%',
+                                            maxWidth:'100%',
+                                            borderRadius: 8
+                                        }}
                                     />
                                 ))}
                             </Box>

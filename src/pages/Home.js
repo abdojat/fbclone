@@ -18,4 +18,4 @@ const Home = () => {
     );
 };
 
-export default Home; // Must have this
+export default Home; 
